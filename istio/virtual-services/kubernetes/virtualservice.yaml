@@ -1,0 +1,21 @@
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: sample-virtualservice
+  namespace: sample
+spec:
+  gateways:
+    - sample-gateway
+  hosts:
+    - '*'
+  http:
+    - match:
+        - uri:
+            prefix: /sample2/
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: sample-service
+            port:
+              number: 80
