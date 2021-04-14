@@ -4,10 +4,11 @@ This sample project shows how to configure an Istio Gateway for an application, 
 
 ## Requirements
 
-- Have a cluster properly configured
-- Have `kubectl` installed and bound to the cluster from the previous step
+- A Kubernetes cluster properly configured
+- `kubectl` installed on local machine and bound to the cluster from the previous step
+- Istio installed on the Kubernetes cluster
 - The Kubernetes cluster must be able to attach LoadBalancers for our services (if using Minikube or MicroK8s, Metallb is recommended)
-- cURL installed
+- cURL installed on local machine
 
 ## Installing the Sample Service in the cluster
 
@@ -48,3 +49,50 @@ A NGINX default index page must be shown.
 ## Changing Sample Endpoint
 
 To try changing dinamically the endpoint of a single Virtual Service it's a piece of cake. Edit `virtualservice.yaml`'s `spec.http[0].match.uri.prefix` from `/sample/` to `/sample2/` (or another path - your choice) and retype the `cURL` command from the previos section. The outcome must be the same.
+
+# Appendix: Installing Microk8s and Istio on Ubuntu
+
+On Ubuntu, make sure you have `snap` package manager installed. Otherwise, that can be achieved through the following command:
+
+```
+$ sudo apt install snap
+```
+
+With `snap installed` Microk8s installation is as simple as this:
+
+```
+$ sudo snap install microk8s --classic
+```
+
+After Microk8s installation, a few add ons must be enabled:
+
+```
+$ microk8s enable ingress
+$ microk8s enable dns
+$ microk8s enable dashboard
+$ microk8s enable storage
+$ microk8s enable registry
+$ microk8s enable metrics-server
+$ microk8s enable metallb
+$ microk8s enable istio
+```
+
+As you can see, istio is among the add ons enabled. You must wait a few minutes before every add on is fully set up.
+
+Microk8s also works as a "wrapper" for `kubectl`. So you can skip `kubectl` installation to user microk8s through command line simply by addind `microk8s ` prefix to every `kubectl` command - although that is not recommended.
+
+Otherwise, if you have `kubectl` installed, you can get Microk8s configuration setup to add to your `~/.kube/config` file with the following command:
+
+```
+$ microk8s config
+```
+
+Make sure you paste the configuration in the proper places if you already have a context configured for another Kubernetes cluster.
+
+To actually use microk8s context with `kubectl` you must command:
+
+```
+$ kubectl config use-context microk8s
+```
+
+And now you're ready to go. [Lens](https://k8slens.dev/) project is also a great graphical way to inspect your kubernetes cluster - give it a try.
